@@ -5,6 +5,7 @@ import java.awt.event.*;
 public class Board implements ActionListener {
   private int clickCount = 0;
   private Square moveFrom;
+  private Square moveTo;
   private Square squares[] = new Square[64];
 
   public static void main(String[] args) {
@@ -34,21 +35,32 @@ public class Board implements ActionListener {
   }
 
   public void actionPerformed(ActionEvent e) {
-    if (clickCount == 0) {
+    if (clickCount == 0 && ((Square) e.getSource()).getPiece() != -1) {
       moveFrom = (Square) e.getSource();
       for (int i = 0; i < 64; i++) {
         if (moveFrom.canMoveTo(squares[i])) {
           squares[i].highlightSelect();
         }
       }
+      for (int i = 0; i < 64; i++) {
+        if (moveFrom.canJumpTo(squares[i])) {
+          squares[i].highlightSelect();
+        }
+      }
       clickCount = 1;
     } else {
+      moveTo = (Square) e.getSource();
+      clickCount = 0;
+      if (moveFrom != moveTo && (moveFrom.canMoveTo(moveTo) || moveFrom.canJumpTo(moveTo))) {
+        moveFrom.moveTo(moveTo);
+        if (Math.abs(moveFrom.getXPos() - moveTo.getXPos()) == 2) {
+          int middleXPos = (moveFrom.getXPos() + moveTo.getXPos())/2;
+          int middleYPos = (moveFrom.getYPos() + moveTo.getYPos())/2;
+          squares[middleXPos + middleYPos * 8].kill();
+        }
+      }
       for (int i = 0; i < 64; i++) {
         squares[i].removeSelect();
-      }
-      clickCount = 0;
-      if (moveFrom != (Square) e.getSource() && moveFrom.canMoveTo((Square) e.getSource())) {
-        moveFrom.moveTo((Square) e.getSource());
       }
     }
   }

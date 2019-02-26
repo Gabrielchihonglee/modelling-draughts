@@ -7,19 +7,18 @@ public class Square extends JButton {
   private int piece = -1; // 0 for red, 1 for white, other for blank
   private ImageIcon redIcon = new ImageIcon("resources/red.png");
   private ImageIcon whiteIcon = new ImageIcon("resources/white.png");
+  private ImageIcon redKingIcon = new ImageIcon("resources/red-king.png");
+  private ImageIcon whiteKingIcon = new ImageIcon("resources/white-king.png");
   private ImageIcon emptyBlackIcon = new ImageIcon("resources/empty-black.png");
   private ImageIcon emptyWhiteIcon = new ImageIcon("resources/empty-white.png");
   private ImageIcon selectIcon = new ImageIcon("resources/selected.png");
-  //private JButton squareButton;
-  private int clickCount = 0;
+  private boolean jumpLeftDown, jumpLeftUp, jumpRightDown, jumpRightUp = false;
 
   public Square(int x, int y) {
     xPos = x;
     yPos = y;
     piece = initializePiece();
-    //squareButton = new JButton();
     update();
-    //JButton squareButton = new JButton(xPos + ", " + yPos);
   }
 
   public int getXPos() {
@@ -46,15 +45,63 @@ public class Square extends JButton {
   }
 
   public boolean canMoveTo(Square target) {
+    int targetXPos = target.getXPos();
+    int targetYPos = target.getYPos();
+    int targetPiece = target.getPiece();
     switch (piece) {
       case 0: // red
-        if ((target.getXPos() == xPos - 1 || target.getXPos() == xPos + 1) && (target.getYPos() == yPos + 1) && (target.getPiece() == -1)) {
-          return true;
+        if ((Math.abs(targetXPos - xPos) == 1) && (targetYPos == yPos + 1)) {
+          if (targetPiece == -1) {
+            return true;
+          } else if (targetPiece == 1) {
+            if (targetXPos < xPos) {
+              jumpLeftDown = true;
+            } else if (targetXPos > xPos) {
+              jumpRightDown = true;
+            }
+          }
         }
         break;
       case 1: // white
-        if ((target.getXPos() == xPos - 1 || target.getXPos() == xPos + 1) && (target.getYPos() == yPos - 1) && (target.getPiece() == -1)) {
-          return true;
+        if ((Math.abs(targetXPos - xPos) == 1) && (targetYPos == yPos - 1)) {
+          if (targetPiece == -1) {
+            return true;
+          } else if (targetPiece == 0) {
+            if (targetXPos < xPos) {
+              jumpLeftUp = true;
+            } else if (targetXPos > xPos) {
+              jumpRightUp = true;
+            }
+          }
+        }
+        break;
+    }
+    return false;
+  }
+
+  public boolean canJumpTo(Square target) {
+    int targetXPos = target.getXPos();
+    int targetYPos = target.getYPos();
+    int targetPiece = target.getPiece();
+    switch (piece) {
+      case 0: // red
+        if ((Math.abs(targetXPos - xPos) == 2) && (targetYPos == yPos + 2) && (targetPiece == -1)) {
+          if (jumpLeftDown && (targetXPos < xPos)) {
+            return true;
+          }
+          if (jumpRightDown && (targetXPos > xPos)) {
+            return true;
+          }
+        }
+        break;
+      case 1: // white
+        if ((Math.abs(targetXPos - xPos) == 2) && (targetYPos == yPos - 2) && (targetPiece == -1)) {
+          if (jumpLeftUp && (targetXPos < xPos)) {
+            return true;
+          }
+          if (jumpRightUp && (targetXPos > xPos)) {
+            return true;
+          }
         }
         break;
     }
@@ -67,13 +114,29 @@ public class Square extends JButton {
 
   public void removeSelect() {
     update();
+    jumpLeftDown = false;
+    jumpLeftUp = false;
+    jumpRightDown = false;
+    jumpRightUp = false;
+  }
+
+  public void kill() {
+    piece = -1;
   }
 
   private void update() {
     if (piece == 0) {
-      setIcon(redIcon);
+      if (yPos == 7) {
+        setIcon(redKingIcon);
+      } else {
+        setIcon(redIcon);
+      }
     } else if (piece == 1) {
-      setIcon(whiteIcon);
+      if (yPos == 0) {
+        setIcon(whiteKingIcon);
+      } else {
+        setIcon(whiteIcon);
+      }
     } else if (xPos % 2 == yPos % 2) {
       setIcon(emptyBlackIcon);
     } else {
