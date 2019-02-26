@@ -1,6 +1,12 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
+/**
+* Represents a square on the board (one of the 64 squares). Extends the JButton
+* class to inherit JButton's instance variables and methods.
+*
+* @author Gabriel Lee
+*/
 public class Square extends JButton {
   private int xPos = -1;
   private int yPos = -1;
@@ -12,8 +18,20 @@ public class Square extends JButton {
   private ImageIcon emptyBlackIcon = new ImageIcon("resources/empty-black.png");
   private ImageIcon emptyWhiteIcon = new ImageIcon("resources/empty-white.png");
   private ImageIcon selectIcon = new ImageIcon("resources/selected.png");
-  private boolean jumpLeftDown, jumpLeftUp, jumpRightDown, jumpRightUp = false;
+  private boolean jumpLeftDown = false;
+  private boolean jumpLeftUp = false;
+  private boolean jumpRightDown = false;
+  private boolean jumpRightUp = false;
 
+  /**
+  * Constructor for the Square object.
+  * It will store the x and y position and calculate which piece should it be
+  * holding based on it's position on the board by {@code initializePiece()}.
+  * Then calls {@code update()} to display the piece on the square.
+  *
+  * @param x x-coordinate of the square on the board (left-most is 0)
+  * @param y y-coordinate of the square on the board (top-most is 0)
+  */
   public Square(int x, int y) {
     xPos = x;
     yPos = y;
@@ -21,22 +39,41 @@ public class Square extends JButton {
     update();
   }
 
+  /**
+  * Accessor for the xPos variable.
+  *
+  * @return int of x position of the square on the board
+  */
   public int getXPos() {
     return xPos;
   }
 
+  /**
+  * Accessor for the yPos variable.
+  *
+  * @return int of y position of the square on the board
+  */
   public int getYPos() {
     return yPos;
   }
 
+  /**
+  * Accessor for the piece variable.
+  *
+  * @return int representing the piece type on the square on the board
+  *  (-1, 0 and 1 represents default, red and white respectively)
+  */
   public int getPiece() {
     return piece;
   }
 
-  public void addSquareButton(JPanel panel) {
-    panel.add(this);
-  }
-
+  /**
+  * Moves the piece in current square to target square.
+  * Replaces target piece by current piece then reset current square's piece.
+  * Then update display.
+  *
+  * @param target the target Square for the piece to move to
+  */
   public void moveTo(Square target) {
     target.piece = piece;
     piece = -1;
@@ -44,6 +81,14 @@ public class Square extends JButton {
     update();
   }
 
+  /**
+  * Performs a series of checks on if the piece on the current square can be
+  * moved to the target square.
+  *
+  * @param target the target Square for the piece to move to
+  * @return boolean for if the piece on the current square can be mvoed to the
+  *  target square.
+  */
   public boolean canMoveTo(Square target) {
     int targetXPos = target.getXPos();
     int targetYPos = target.getYPos();
@@ -75,10 +120,23 @@ public class Square extends JButton {
           }
         }
         break;
+      default:
+        return false;
+        break;
     }
     return false;
   }
 
+  /**
+  * Performs a series of checks on if the piece on the current square can be
+  * jumped, over an opponent's piece, to the target square. It is different from
+  * the {@link #canMoveTo(Square target)} method, as checks only for moving to next diagonal
+  * position, but not jumping across an opponent's piece.
+  *
+  * @param target the target Square for the piece to move to
+  * @return boolean for if the piece on the current square can be jumped to the
+  *  target square.
+  */
   public boolean canJumpTo(Square target) {
     int targetXPos = target.getXPos();
     int targetYPos = target.getYPos();
@@ -104,14 +162,24 @@ public class Square extends JButton {
           }
         }
         break;
+      default:
+        return false;
+        break;
     }
     return false;
   }
 
+  /**
+  * Highlights the square by changing the icon to selected.png.
+  */
   public void highlightSelect() {
     setIcon(selectIcon);
   }
 
+  /**
+  * Removes highlight from the square by calling update() to reset normal icons
+  * (pieces or empty icons). Also resets {@link #canJumpTo(Square target)}-used variables.
+  */
   public void removeSelect() {
     update();
     jumpLeftDown = false;
@@ -120,10 +188,17 @@ public class Square extends JButton {
     jumpRightUp = false;
   }
 
+  /**
+  * Removes the piece on the square.
+  */
   public void kill() {
     piece = -1;
   }
 
+  /**
+  * Updates the icon of the square (pieces or blank icons) based on the square's
+  * variable (piece and position).
+  */
   private void update() {
     if (piece == 0) {
       if (yPos == 7) {
@@ -144,6 +219,12 @@ public class Square extends JButton {
     }
   }
 
+  /**
+  * Calculates the piece on the square based on the square's position.
+  *
+  * @return int representing the piece (-1, 0 and 1 represents default, red and
+  *  white respectively).
+  */
   private int initializePiece() {
     if (xPos % 2 != yPos % 2) {
       if (yPos < 3) {
