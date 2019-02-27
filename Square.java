@@ -120,9 +120,6 @@ public class Square extends JButton {
           }
         }
         break;
-      default:
-        return false;
-        break;
     }
     return false;
   }
@@ -162,9 +159,6 @@ public class Square extends JButton {
           }
         }
         break;
-      default:
-        return false;
-        break;
     }
     return false;
   }
@@ -178,10 +172,17 @@ public class Square extends JButton {
 
   /**
   * Removes highlight from the square by calling update() to reset normal icons
-  * (pieces or empty icons). Also resets {@link #canJumpTo(Square target)}-used variables.
+  * (pieces or empty icons).
   */
   public void removeSelect() {
     update();
+  }
+
+  /**
+  * Resets {@link #canJumpTo(Square target)}-used variables. Should be called
+  * after each jump.
+  */
+  public void resetJumpStatus() {
     jumpLeftDown = false;
     jumpLeftUp = false;
     jumpRightDown = false;
@@ -193,6 +194,7 @@ public class Square extends JButton {
   */
   public void kill() {
     piece = -1;
+    update();
   }
 
   /**
