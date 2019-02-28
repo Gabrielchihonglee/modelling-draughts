@@ -11,13 +11,13 @@ public class Square extends JButton {
   private int xPos = -1;
   private int yPos = -1;
   private int piece = -1; // 0 for red, 1 for white, other for blank
-  private ImageIcon redIcon = new ImageIcon("resources/red.png");
-  private ImageIcon whiteIcon = new ImageIcon("resources/white.png");
-  private ImageIcon redKingIcon = new ImageIcon("resources/red-king.png");
-  private ImageIcon whiteKingIcon = new ImageIcon("resources/white-king.png");
-  private ImageIcon emptyBlackIcon = new ImageIcon("resources/empty-black.png");
-  private ImageIcon emptyWhiteIcon = new ImageIcon("resources/empty-white.png");
-  private ImageIcon selectIcon = new ImageIcon("resources/selected.png");
+  private ImageIcon redIcon;
+  private ImageIcon whiteIcon;
+  private ImageIcon redKingIcon;
+  private ImageIcon whiteKingIcon;
+  private ImageIcon emptyBlackIcon;
+  private ImageIcon emptyWhiteIcon;
+  private ImageIcon selectIcon;
   private boolean jumpLeftDown = false;
   private boolean jumpLeftUp = false;
   private boolean jumpRightDown = false;
@@ -35,9 +35,47 @@ public class Square extends JButton {
   public Square(int x, int y) {
     xPos = x;
     yPos = y;
+    setupIcons(1);
     piece = initializePiece();
     update();
   }
+
+  /**
+  * A secodary constructor for the Square object.
+  * Takes in the x and y position of the square, along with the graphics
+  * version.
+  *
+  * @param x x-coordinate of the square on the board (left-most is 0)
+  * @param y y-coordinate of the square on the board (top-most is 0)
+  */
+  public Square(int x, int y, int graphicsVer) {
+    xPos = x;
+    yPos = y;
+    setupIcons(graphicsVer);
+    piece = initializePiece();
+    update();
+  }
+
+  /**
+  * TODO: support custom piece on creation.
+  *
+  * A secondary constructor for the Square object.
+  * Takes in the x and y position of the square, along with the piece for custom
+  * game situations.
+  *
+  * @param x x-coordinate of the square on the board (left-most is 0)
+  * @param y y-coordinate of the square on the board (top-most is 0)
+  * @param pieceId int representing the piece type
+  *  (-1, 0 and 1 represents default, red and white respectively)
+  **/
+  /**
+  public Square(int x, int y, int pieceId) {
+    xPos = x;
+    yPos = y;
+    piece = pieceId;
+    update();
+  }
+  **/
 
   /**
   * Accessor for the xPos variable.
@@ -218,6 +256,29 @@ public class Square extends JButton {
       setIcon(emptyBlackIcon);
     } else {
       setIcon(emptyWhiteIcon);
+    }
+  }
+
+  private void setupIcons(int graphicsVer) {
+    switch (graphicsVer) {
+      case 2:
+        redIcon = new ImageIcon("resources/v2/red.png");
+        whiteIcon = new ImageIcon("resources/v2/white.png");
+        redKingIcon = new ImageIcon("resources/v2/red-king.png");
+        whiteKingIcon = new ImageIcon("resources/v2/white-king.png");
+        emptyBlackIcon = new ImageIcon("resources/v2/empty-black.png");
+        emptyWhiteIcon = new ImageIcon("resources/v2/empty-white.png");
+        selectIcon = new ImageIcon("resources/v2/selected.png");
+        break;
+      default:
+        redIcon = new ImageIcon("resources/red.png");
+        whiteIcon = new ImageIcon("resources/white.png");
+        redKingIcon = new ImageIcon("resources/red-king.png");
+        whiteKingIcon = new ImageIcon("resources/white-king.png");
+        emptyBlackIcon = new ImageIcon("resources/empty-black.png");
+        emptyWhiteIcon = new ImageIcon("resources/empty-white.png");
+        selectIcon = new ImageIcon("resources/selected.png");
+        break;
     }
   }
 

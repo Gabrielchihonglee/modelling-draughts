@@ -16,12 +16,14 @@ public class Board extends JFrame implements ActionListener {
   private int playerTurn = 1;
   private boolean validFrom = false;
   private boolean jumpStreak = false;
+  private int graphicsVer = 1;
 
   public static void main(String[] args) {
-    Board board = new Board();
+    Board board = new Board(args);
   }
 
-  private Board() {
+  private Board(String[] args) {
+    handleArgs(args);
     updateTitleTurn();
     setSize(800, 800);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -35,12 +37,26 @@ public class Board extends JFrame implements ActionListener {
     panel.setLayout(boardLayout);
 
     for (int i = 0; i < 64; i++) {
-      squares[i] = new Square(i % 8, i / 8 % 8);
+      if (graphicsVer == 2) {
+        squares[i] = new Square(i % 8, i / 8 % 8, 2);
+      } else {
+        squares[i] = new Square(i % 8, i / 8 % 8);
+      }
       panel.add(squares[i]);
       squares[i].addActionListener(this);
     }
 
     revalidate();
+  }
+
+  private void handleArgs(String[] args) {
+    for (int i = 0; i < args.length; i++) {
+      switch (args[i]) {
+        case "-v2graphics":
+          graphicsVer = 2;
+          break;
+      }
+    }
   }
 
   /**
@@ -107,7 +123,7 @@ public class Board extends JFrame implements ActionListener {
         setTitle("Draughts: Red's turn");
         break;
       default:
-        System.out.println("TODO: Should be exception here..."); //TODO: add exception handler
+        System.out.println("Error: Unknown or unexpected playerTurn value.");
         break;
     }
   }
