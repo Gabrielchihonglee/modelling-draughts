@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.Arrays;
 import javax.swing.*;
 
 /**
@@ -12,17 +14,20 @@ public class Board extends JFrame implements ActionListener {
   private int clickCount = 0;
   private Square moveFrom;
   private Square moveTo;
-  private Square[] squares = new Square[64];
+  private Square[][] squares = new Square[8][8];
   private int playerTurn = 1;
   private boolean validFrom = false;
   private boolean jumpStreak = false;
   private int graphicsVer = 1;
+  private boolean defaultLayout = true;
+  private int[][] layoutInput = new int[8][8];
 
   public static void main(String[] args) {
     Board board = new Board(args);
   }
 
   private Board(String[] args) {
+    //Arrays.fill(layoutInput, -1);
     handleArgs(args);
     updateTitleTurn();
     setSize(800, 800);
@@ -36,14 +41,16 @@ public class Board extends JFrame implements ActionListener {
     GridLayout boardLayout = new GridLayout(8, 8);
     panel.setLayout(boardLayout);
 
-    for (int i = 0; i < 64; i++) {
-      if (graphicsVer == 1) {
-        squares[i] = new Square(i % 8, i / 8 % 8);
-      } else {
-        squares[i] = new Square(i % 8, i / 8 % 8, graphicsVer, -1);
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        if (graphicsVer == 1 && defaultLayout) {
+          squares[i][j] = new Square(j, i);
+        } else {
+          squares[i][j] = new Square(j, i, graphicsVer, layoutInput[i][j]);
+        }
+        panel.add(squares[i][j]);
+        squares[i][j].addActionListener(this);
       }
-      panel.add(squares[i]);
-      squares[i].addActionListener(this);
     }
 
     revalidate();
@@ -59,11 +66,11 @@ public class Board extends JFrame implements ActionListener {
           System.out.println("Options:");
           System.out.println("  -h, --help            show this help text");
           System.out.println("  --graphics versionId  specify graphics");
-          System.out.println("  --layout layout[]     specify starting layout");
+          System.out.println("  --layout layout       specify layout file");
           System.exit(0);
           break;
         case "--graphics":
-          if((i + 1) >= args.length){
+          if((i + 1) >= args.length || args[i + 1].charAt(0) == '-'){
             System.out.println("Error: graphics version id not specified");
             System.exit(0);
           }
@@ -73,6 +80,21 @@ public class Board extends JFrame implements ActionListener {
             System.exit(0);
           }
           break;
+        case "--layout":
+          defaultLayout = false;
+          try {
+            BufferedReader layoutInputBR = new BufferedReader(new FileReader(args[i + 1]));//args[i + 1]
+            String line;
+            String[] lineElements;
+            for (int fileRow = 0; (line = layoutInputBR.readLine()) != null; fileRow++) {
+              lineElements = line.split(",");
+              for (int fileCol = 0; fileCol < lineElements.length; fileCol++) {
+                layoutInput[fileRow][fileCol] = Integer.parseInt(lineElements[fileCol]);
+              }
+            }
+          } catch(IOException e) {
+            e.printStackTrace();
+          }
       }
     }
   }
@@ -87,16 +109,20 @@ public class Board extends JFrame implements ActionListener {
     updateTitleTurn();
     if (clickCount == 0 && ((Square) e.getSource()).getPiece() == playerTurn) {
       moveFrom = (Square) e.getSource();
-      for (int i = 0; i < 64; i++) {
-        if (moveFrom.canMoveTo(squares[i])) {
-          validFrom = true;
-          squares[i].highlightSelect();
+      for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+          if (moveFrom.canMoveTo(squares[i][j])) {
+            validFrom = true;
+            squares[i][j].highlightSelect();
+          }
         }
       }
-      for (int i = 0; i < 64; i++) {
-        if (moveFrom.canJumpTo(squares[i])) {
-          validFrom = true;
-          squares[i].highlightSelect();
+      for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+          if (moveFrom.canJumpTo(squares[i][j])) {
+            validFrom = true;
+            squares[i][j].highlightSelect();
+          }
         }
       }
       if (validFrom) {
@@ -109,8 +135,10 @@ public class Board extends JFrame implements ActionListener {
       moveTo = (Square) e.getSource();
       clickCount = 0;
       validFrom = false;
-      for (int i = 0; i < 64; i++) {
-        squares[i].removeSelect();
+      for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+          squares[i][j].removeSelect();
+        }
       }
       if (moveFrom != moveTo && (moveFrom.canMoveTo(moveTo) || moveFrom.canJumpTo(moveTo))) {
         moveFrom.moveTo(moveTo);
@@ -118,9 +146,11 @@ public class Board extends JFrame implements ActionListener {
         if (Math.abs(moveFrom.getXPos() - moveTo.getXPos()) == 2) {
           int middleXPos = (moveFrom.getXPos() + moveTo.getXPos()) / 2;
           int middleYPos = (moveFrom.getYPos() + moveTo.getYPos()) / 2;
-          squares[middleXPos + middleYPos * 8].kill();
-          for (int i = 0; i < 64; i++) {
-            squares[i].resetJumpStatus();
+          squares[middleYPos][middleXPos].kill();
+          for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+              squares[i][j].resetJumpStatus();
+            }
           }
           jumpStreak = true;
           moveTo.doClick();
