@@ -47,35 +47,20 @@ public class Square extends JButton {
   *
   * @param x x-coordinate of the square on the board (left-most is 0)
   * @param y y-coordinate of the square on the board (top-most is 0)
+  * @param graphicsVer version id of the graphics pack
+  * @param pieceId id of the piece to be initialized on the square
   */
-  public Square(int x, int y, int graphicsVer) {
+  public Square(int x, int y, int graphicsVer, int pieceId) {
     xPos = x;
     yPos = y;
     setupIcons(graphicsVer);
-    piece = initializePiece();
+    if (pieceId == -1) {
+      piece = initializePiece();
+    } else {
+      piece = pieceId;
+    }
     update();
   }
-
-  /**
-  * TODO: support custom piece on creation.
-  *
-  * A secondary constructor for the Square object.
-  * Takes in the x and y position of the square, along with the piece for custom
-  * game situations.
-  *
-  * @param x x-coordinate of the square on the board (left-most is 0)
-  * @param y y-coordinate of the square on the board (top-most is 0)
-  * @param pieceId int representing the piece type
-  *  (-1, 0 and 1 represents default, red and white respectively)
-  **/
-  /**
-  public Square(int x, int y, int pieceId) {
-    xPos = x;
-    yPos = y;
-    piece = pieceId;
-    update();
-  }
-  **/
 
   /**
   * Accessor for the xPos variable.
@@ -260,26 +245,13 @@ public class Square extends JButton {
   }
 
   private void setupIcons(int graphicsVer) {
-    switch (graphicsVer) {
-      case 2:
-        redIcon = new ImageIcon("resources/v2/red.png");
-        whiteIcon = new ImageIcon("resources/v2/white.png");
-        redKingIcon = new ImageIcon("resources/v2/red-king.png");
-        whiteKingIcon = new ImageIcon("resources/v2/white-king.png");
-        emptyBlackIcon = new ImageIcon("resources/v2/empty-black.png");
-        emptyWhiteIcon = new ImageIcon("resources/v2/empty-white.png");
-        selectIcon = new ImageIcon("resources/v2/selected.png");
-        break;
-      default:
-        redIcon = new ImageIcon("resources/red.png");
-        whiteIcon = new ImageIcon("resources/white.png");
-        redKingIcon = new ImageIcon("resources/red-king.png");
-        whiteKingIcon = new ImageIcon("resources/white-king.png");
-        emptyBlackIcon = new ImageIcon("resources/empty-black.png");
-        emptyWhiteIcon = new ImageIcon("resources/empty-white.png");
-        selectIcon = new ImageIcon("resources/selected.png");
-        break;
-    }
+    redIcon = new ImageIcon("resources/v" + graphicsVer + "/red.png");
+    whiteIcon = new ImageIcon("resources/v" + graphicsVer + "/white.png");
+    redKingIcon = new ImageIcon("resources/v" + graphicsVer + "/red-king.png");
+    whiteKingIcon = new ImageIcon("resources/v" + graphicsVer + "/white-king.png");
+    emptyBlackIcon = new ImageIcon("resources/v" + graphicsVer + "/empty-black.png");
+    emptyWhiteIcon = new ImageIcon("resources/v" + graphicsVer + "/empty-white.png");
+    selectIcon = new ImageIcon("resources/v" + graphicsVer + "/selected.png");
   }
 
   /**

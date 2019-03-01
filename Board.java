@@ -37,10 +37,10 @@ public class Board extends JFrame implements ActionListener {
     panel.setLayout(boardLayout);
 
     for (int i = 0; i < 64; i++) {
-      if (graphicsVer == 2) {
-        squares[i] = new Square(i % 8, i / 8 % 8, 2);
-      } else {
+      if (graphicsVer == 1) {
         squares[i] = new Square(i % 8, i / 8 % 8);
+      } else {
+        squares[i] = new Square(i % 8, i / 8 % 8, graphicsVer, -1);
       }
       panel.add(squares[i]);
       squares[i].addActionListener(this);
@@ -52,8 +52,26 @@ public class Board extends JFrame implements ActionListener {
   private void handleArgs(String[] args) {
     for (int i = 0; i < args.length; i++) {
       switch (args[i]) {
-        case "-v2graphics":
-          graphicsVer = 2;
+        case "-h":
+        case "--help":
+          System.out.println("Usage:");
+          System.out.println("  java " + this.getClass().getName() + " [options]");
+          System.out.println("Options:");
+          System.out.println("  -h, --help            show this help text");
+          System.out.println("  --graphics versionId  specify graphics");
+          System.out.println("  --layout layout[]     specify starting layout");
+          System.exit(0);
+          break;
+        case "--graphics":
+          if((i + 1) >= args.length){
+            System.out.println("Error: graphics version id not specified");
+            System.exit(0);
+          }
+          graphicsVer = Integer.parseInt(args[i + 1]);
+          if (graphicsVer > 2 || graphicsVer < 1) {
+            System.out.println("Error: graphics version id does not exist");
+            System.exit(0);
+          }
           break;
       }
     }
