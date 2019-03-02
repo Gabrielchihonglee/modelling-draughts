@@ -45,6 +45,8 @@ public class Board extends JFrame implements ActionListener {
       for (int j = 0; j < 8; j++) {
         if (graphicsVer == 1 && defaultLayout) {
           squares[i][j] = new Square(j, i);
+        } else if (defaultLayout) {
+          squares[i][j] = new Square(j, i, graphicsVer, -1);
         } else {
           squares[i][j] = new Square(j, i, graphicsVer, layoutInput[i][j]);
         }
@@ -107,11 +109,11 @@ public class Board extends JFrame implements ActionListener {
   */
   public void actionPerformed(ActionEvent e) {
     updateTitleTurn();
-    if (clickCount == 0 && ((Square) e.getSource()).getPiece() == playerTurn) {
+    if (clickCount == 0 && ((((Square) e.getSource()).getPiece() == playerTurn) || (((Square) e.getSource()).getPiece() - 2 == playerTurn))) {
       moveFrom = (Square) e.getSource();
       for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-          if (moveFrom.canMoveTo(squares[i][j])) {
+          if (moveFrom.canMoveTo(squares[i][j])) { // && jumpStreak == false
             validFrom = true;
             squares[i][j].highlightSelect();
           }
@@ -142,7 +144,6 @@ public class Board extends JFrame implements ActionListener {
       }
       if (moveFrom != moveTo && (moveFrom.canMoveTo(moveTo) || moveFrom.canJumpTo(moveTo))) {
         moveFrom.moveTo(moveTo);
-        //                      System.out.println(moveFrom.getXPos() + ", " + moveTo.getXPos());
         if (Math.abs(moveFrom.getXPos() - moveTo.getXPos()) == 2) {
           int middleXPos = (moveFrom.getXPos() + moveTo.getXPos()) / 2;
           int middleYPos = (moveFrom.getYPos() + moveTo.getYPos()) / 2;

@@ -10,7 +10,7 @@ import javax.swing.*;
 public class Square extends JButton {
   private int xPos = -1;
   private int yPos = -1;
-  private int piece = -1; // 0 for red, 1 for white, other for blank
+  private int piece = -1; // 0 for red, 1 for white, 2 for red king, 3 for white king, -1 for blank
   private ImageIcon redIcon;
   private ImageIcon whiteIcon;
   private ImageIcon redKingIcon;
@@ -118,6 +118,7 @@ public class Square extends JButton {
     int targetPiece = target.getPiece();
     switch (piece) {
       case 0: // red
+      case 3:
         if ((Math.abs(targetXPos - xPos) == 1) && (targetYPos == yPos + 1)) {
           if (targetPiece == -1) {
             return true;
@@ -131,6 +132,7 @@ public class Square extends JButton {
         }
         break;
       case 1: // white
+      case 2:
         if ((Math.abs(targetXPos - xPos) == 1) && (targetYPos == yPos - 1)) {
           if (targetPiece == -1) {
             return true;
@@ -163,6 +165,7 @@ public class Square extends JButton {
     int targetPiece = target.getPiece();
     switch (piece) {
       case 0: // red
+      case 3:
         if ((Math.abs(targetXPos - xPos) == 2) && (targetYPos == yPos + 2) && (targetPiece == -1)) {
           if (jumpLeftDown && (targetXPos < xPos)) {
             return true;
@@ -173,6 +176,7 @@ public class Square extends JButton {
         }
         break;
       case 1: // white
+      case 2:
         if ((Math.abs(targetXPos - xPos) == 2) && (targetYPos == yPos - 2) && (targetPiece == -1)) {
           if (jumpLeftUp && (targetXPos < xPos)) {
             return true;
@@ -225,22 +229,36 @@ public class Square extends JButton {
   * variable (piece and position).
   */
   private void update() {
-    if (piece == 0) {
-      if (yPos == 7) {
+    switch (piece) {
+      case 0:
+        if (yPos == 7) {
+          piece = 2;
+          setIcon(redKingIcon);
+        } else {
+          setIcon(redIcon);
+        }
+        break;
+      case 1:
+        if (yPos == 0) {
+          piece = 3;
+          setIcon(whiteKingIcon);
+        } else {
+          setIcon(whiteIcon);
+        }
+        break;
+      case 2:
         setIcon(redKingIcon);
-      } else {
-        setIcon(redIcon);
-      }
-    } else if (piece == 1) {
-      if (yPos == 0) {
+        break;
+      case 3:
         setIcon(whiteKingIcon);
-      } else {
-        setIcon(whiteIcon);
-      }
-    } else if (xPos % 2 == yPos % 2) {
-      setIcon(emptyBlackIcon);
-    } else {
-      setIcon(emptyWhiteIcon);
+        break;
+      default:
+        if (xPos % 2 == yPos % 2) {
+          setIcon(emptyBlackIcon);
+        } else {
+          setIcon(emptyWhiteIcon);
+        }
+        break;
     }
   }
 
