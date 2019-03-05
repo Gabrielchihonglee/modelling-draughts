@@ -10,7 +10,7 @@ import javax.swing.*;
 public class Square extends JButton {
   private int xPos = -1;
   private int yPos = -1;
-  private int piece = -1; // 0 for red, 1 for white, 2 for red king, 3 for white king, -1 for blank
+  private int piece = -2; // 0 for red, 1 for white, 2 for red king, 3 for white king, -1 for blank
   private ImageIcon redIcon;
   private ImageIcon whiteIcon;
   private ImageIcon redKingIcon;
@@ -54,7 +54,7 @@ public class Square extends JButton {
     xPos = x;
     yPos = y;
     setupIcons(graphicsVer);
-    if (pieceId == -1) {
+    if (pieceId == -2) {
       piece = initializePiece();
     } else {
       piece = pieceId;

@@ -20,6 +20,7 @@ public class Board extends JFrame implements ActionListener {
   private boolean jumpStreak = false;
   private int graphicsVer = 1;
   private boolean defaultLayout = true;
+  private boolean exitExport = false;
   private int[][] layoutInput = new int[8][8];
 
   public static void main(String[] args) {
@@ -31,7 +32,28 @@ public class Board extends JFrame implements ActionListener {
     handleArgs(args);
     updateTitleTurn();
     setSize(800, 800);
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
+    addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e) {
+        if (exitExport) {
+          try {
+            BufferedWriter layoutOutputBW = new BufferedWriter(new FileWriter("export.csv"));
+            String line = "";
+            for (int i = 0; i < 8; i++) {
+              for (int j = 0; j < 8; j++) {
+                line += squares[i][j].getPiece() + ",";
+              }
+              line = line.substring(0, line.length() - 1);
+              line += "\n";
+            }
+            layoutOutputBW.write(line);
+            layoutOutputBW.close();
+          } catch(IOException eClose) {
+            eClose.printStackTrace();
+          }
+        }
+        System.exit(0);
+      }
+    });
     setResizable(false);
     setVisible(true);
 
@@ -46,7 +68,7 @@ public class Board extends JFrame implements ActionListener {
         if (graphicsVer == 1 && defaultLayout) {
           squares[i][j] = new Square(j, i);
         } else if (defaultLayout) {
-          squares[i][j] = new Square(j, i, graphicsVer, -1);
+          squares[i][j] = new Square(j, i, graphicsVer, -2);
         } else {
           squares[i][j] = new Square(j, i, graphicsVer, layoutInput[i][j]);
         }
@@ -69,6 +91,7 @@ public class Board extends JFrame implements ActionListener {
           System.out.println("  -h, --help            show this help text");
           System.out.println("  --graphics versionId  specify graphics");
           System.out.println("  --layout layout       specify layout file");
+          System.out.println("  -e, --export          exports layout on close");
           System.exit(0);
           break;
         case "--graphics":
@@ -94,9 +117,14 @@ public class Board extends JFrame implements ActionListener {
                 layoutInput[fileRow][fileCol] = Integer.parseInt(lineElements[fileCol]);
               }
             }
-          } catch(IOException e) {
-            e.printStackTrace();
+          } catch(IOException eInput) {
+            eInput.printStackTrace();
           }
+          break;
+        case "-e":
+        case "--export":
+          exitExport = true;
+          break;
       }
     }
   }
@@ -113,9 +141,11 @@ public class Board extends JFrame implements ActionListener {
       moveFrom = (Square) e.getSource();
       for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-          if (moveFrom.canMoveTo(squares[i][j])) { // && jumpStreak == false
-            validFrom = true;
-            squares[i][j].highlightSelect();
+          if (moveFrom.canMoveTo(squares[i][j])) {
+            if (!jumpStreak) {
+              validFrom = true;
+              squares[i][j].highlightSelect();
+            }
           }
         }
       }
