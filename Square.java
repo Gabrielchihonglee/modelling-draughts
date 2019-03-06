@@ -118,11 +118,10 @@ public class Square extends JButton {
     int targetPiece = target.getPiece();
     switch (piece) {
       case 0: // red
-      case 3:
         if ((Math.abs(targetXPos - xPos) == 1) && (targetYPos == yPos + 1)) {
           if (targetPiece == -1) {
             return true;
-          } else if (targetPiece == 1) {
+          } else if ((targetPiece != piece) && (targetPiece != piece + 2)) {
             if (targetXPos < xPos) {
               jumpLeftDown = true;
             } else if (targetXPos > xPos) {
@@ -132,15 +131,36 @@ public class Square extends JButton {
         }
         break;
       case 1: // white
-      case 2:
         if ((Math.abs(targetXPos - xPos) == 1) && (targetYPos == yPos - 1)) {
           if (targetPiece == -1) {
             return true;
-          } else if (targetPiece == 0) {
+          } else if ((targetPiece != piece) && (targetPiece != piece + 2)) {
             if (targetXPos < xPos) {
               jumpLeftUp = true;
             } else if (targetXPos > xPos) {
               jumpRightUp = true;
+            }
+          }
+        }
+        break;
+      case 2:
+      case 3:
+        if ((Math.abs(targetXPos - xPos) == 1) && (Math.abs(targetYPos - yPos) == 1)) {
+          if (targetPiece == -1) {
+            return true;
+          } else if ((targetPiece != piece) && (targetPiece != piece - 2)) {
+            if (targetXPos < xPos) {
+              if (targetYPos < yPos) {
+                jumpLeftDown = true;
+              } else {
+                jumpLeftUp = true;
+              }
+            } else if (targetXPos > xPos) {
+              if (targetYPos < yPos) {
+                jumpRightDown = true;
+              } else {
+                jumpRightUp = true;
+              }
             }
           }
         }
@@ -165,7 +185,6 @@ public class Square extends JButton {
     int targetPiece = target.getPiece();
     switch (piece) {
       case 0: // red
-      case 3:
         if ((Math.abs(targetXPos - xPos) == 2) && (targetYPos == yPos + 2) && (targetPiece == -1)) {
           if (jumpLeftDown && (targetXPos < xPos)) {
             return true;
@@ -176,7 +195,6 @@ public class Square extends JButton {
         }
         break;
       case 1: // white
-      case 2:
         if ((Math.abs(targetXPos - xPos) == 2) && (targetYPos == yPos - 2) && (targetPiece == -1)) {
           if (jumpLeftUp && (targetXPos < xPos)) {
             return true;
@@ -186,6 +204,20 @@ public class Square extends JButton {
           }
         }
         break;
+      case 2:
+      case 3:
+        if (jumpLeftUp && (targetXPos == xPos - 2) && (targetYPos == yPos + 2) && (targetPiece == -1)) {
+          return true;
+        }
+        if (jumpRightUp && (targetXPos == xPos + 2) && (targetYPos == yPos + 2) && (targetPiece == -1)) {
+          return true;
+        }
+        if (jumpLeftDown && (targetXPos == xPos - 2) && (targetYPos == yPos - 2) && (targetPiece == -1)) {
+          return true;
+        }
+        if (jumpRightDown && (targetXPos == xPos + 2) && (targetYPos == yPos - 2) && (targetPiece == -1)) {
+          return true;
+        }
     }
     return false;
   }
