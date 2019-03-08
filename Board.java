@@ -28,12 +28,12 @@ public class Board extends JFrame implements ActionListener {
   }
 
   private Board(String[] args) {
-    //Arrays.fill(layoutInput, -1);
     handleArgs(args);
     updateTitleTurn();
     setSize(800, 800);
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent e) {
+        // export layout to file if the option was selected
         if (exitExport) {
           try {
             BufferedWriter layoutOutputBW = new BufferedWriter(new FileWriter("export.csv"));
@@ -65,8 +65,8 @@ public class Board extends JFrame implements ActionListener {
 
     for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {
-        if (graphicsVer == 1 && defaultLayout) {
-          squares[i][j] = new Square(j, i);
+        if (graphicsVer == 1 && defaultLayout) { // everything default
+          squares[i][j] = new Square(j, i); // kept for assignment requirements fulfillment purpose
         } else if (defaultLayout) {
           squares[i][j] = new Square(j, i, graphicsVer, -2);
         } else {
@@ -77,9 +77,14 @@ public class Board extends JFrame implements ActionListener {
       }
     }
 
-    revalidate();
+    revalidate(); // update frame to show newly added squares
   }
 
+  /**
+  * Handles command line interface arguments
+  *
+  * @param args an array of arguments
+  */
   private void handleArgs(String[] args) {
     for (int i = 0; i < args.length; i++) {
       switch (args[i]) {
@@ -108,11 +113,11 @@ public class Board extends JFrame implements ActionListener {
         case "--layout":
           defaultLayout = false;
           try {
-            BufferedReader layoutInputBR = new BufferedReader(new FileReader(args[i + 1]));//args[i + 1]
+            BufferedReader layoutInputBR = new BufferedReader(new FileReader(args[i + 1])); // read file specified in next argument
             String line;
             String[] lineElements;
             for (int fileRow = 0; (line = layoutInputBR.readLine()) != null; fileRow++) {
-              lineElements = line.split(",");
+              lineElements = line.split(","); // expects comma seperated file format
               for (int fileCol = 0; fileCol < lineElements.length; fileCol++) {
                 layoutInput[fileRow][fileCol] = Integer.parseInt(lineElements[fileCol]);
               }
@@ -137,18 +142,20 @@ public class Board extends JFrame implements ActionListener {
   */
   public void actionPerformed(ActionEvent e) {
     updateTitleTurn();
-    if (clickCount == 0 && ((((Square) e.getSource()).getPiece() == playerTurn) || (((Square) e.getSource()).getPiece() - 2 == playerTurn))) {
+    if (clickCount == 0 && ((((Square) e.getSource()).getPiece() == playerTurn) || (((Square) e.getSource()).getPiece() - 2 == playerTurn))) { // first click and matches player turn
       moveFrom = (Square) e.getSource();
+      // goes over all squares to check if it's a valid moving target
       for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
           if (moveFrom.canMoveTo(squares[i][j])) {
-            if (!jumpStreak) {
+            if (!jumpStreak) { // player shouldn't be allowed to move after jumping
               validFrom = true;
               squares[i][j].highlightSelect();
             }
           }
         }
       }
+      // goes over all squares to check if it's a valid jumping target
       for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
           if (moveFrom.canJumpTo(squares[i][j])) {
@@ -159,14 +166,15 @@ public class Board extends JFrame implements ActionListener {
       }
       if (validFrom) {
         clickCount = 1;
-      } else if (jumpStreak) {
+      } else if (jumpStreak) { // not valid from (can't jump anymore) and is in jump streak
         jumpStreak = false;
         playerTurn ^= 1;
       }
-    } else {
+    } else { // second click
       moveTo = (Square) e.getSource();
       clickCount = 0;
       validFrom = false;
+      // clear all highlights
       for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
           squares[i][j].removeSelect();
@@ -174,6 +182,7 @@ public class Board extends JFrame implements ActionListener {
       }
       if (moveFrom != moveTo && (moveFrom.canMoveTo(moveTo) || moveFrom.canJumpTo(moveTo))) {
         moveFrom.moveTo(moveTo);
+        // handle jumps
         if (Math.abs(moveFrom.getXPos() - moveTo.getXPos()) == 2) {
           int middleXPos = (moveFrom.getXPos() + moveTo.getXPos()) / 2;
           int middleYPos = (moveFrom.getYPos() + moveTo.getYPos()) / 2;
@@ -184,6 +193,7 @@ public class Board extends JFrame implements ActionListener {
             }
           }
           jumpStreak = true;
+          // triggers a click event after jumping to check if it can jump again
           moveTo.doClick();
         } else {
           playerTurn ^= 1;
@@ -193,6 +203,9 @@ public class Board extends JFrame implements ActionListener {
     updateTitleTurn();
   }
 
+  /**
+  * Updates frame title to show whose turn is it.
+  */
   private void updateTitleTurn() {
     switch (playerTurn) {
       case 1:

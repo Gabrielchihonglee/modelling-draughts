@@ -25,6 +25,7 @@ public class Square extends JButton {
 
   /**
   * Constructor for the Square object.
+  * (Kept for assignment specifications fulfillment purpose)
   * It will store the x and y position and calculate which piece should it be
   * holding based on it's position on the board by {@code initializePiece()}.
   * Then calls {@code update()} to display the piece on the square.
@@ -54,7 +55,7 @@ public class Square extends JButton {
     xPos = x;
     yPos = y;
     setupIcons(graphicsVer);
-    if (pieceId == -2) {
+    if (pieceId == -2) { // default piece id
       piece = initializePiece();
     } else {
       piece = pieceId;
@@ -143,8 +144,8 @@ public class Square extends JButton {
           }
         }
         break;
-      case 2:
-      case 3:
+      case 2: // red king
+      case 3: // white king
         if ((Math.abs(targetXPos - xPos) == 1) && (Math.abs(targetYPos - yPos) == 1)) {
           if (targetPiece == -1) {
             return true;
@@ -204,8 +205,8 @@ public class Square extends JButton {
           }
         }
         break;
-      case 2:
-      case 3:
+      case 2: // red king
+      case 3: // white king
         if (jumpLeftUp && (targetXPos == xPos - 2) && (targetYPos == yPos + 2) && (targetPiece == -1)) {
           return true;
         }
@@ -294,6 +295,13 @@ public class Square extends JButton {
     }
   }
 
+  /**
+  * Sets the icon for the square according to the graphics version selected.
+  *
+  * @param graphicsVer graphics version id
+  * @return int representing the piece (-1, 0 and 1 represents default, red and
+  *  white respectively).
+  */
   private void setupIcons(int graphicsVer) {
     redIcon = new ImageIcon("resources/v" + graphicsVer + "/red.png");
     whiteIcon = new ImageIcon("resources/v" + graphicsVer + "/white.png");
@@ -311,7 +319,7 @@ public class Square extends JButton {
   *  white respectively).
   */
   private int initializePiece() {
-    if (xPos % 2 != yPos % 2) {
+    if (xPos % 2 != yPos % 2) { // x odd, y even OR x even, y odd
       if (yPos < 3) {
         return 0;
       }
