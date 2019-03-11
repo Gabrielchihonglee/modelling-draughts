@@ -6,7 +6,8 @@ import javax.swing.*;
 
 /**
 * Board is the main class for the draught game. It contains the main framework
-* and logic for the game. Squares can be added to the board.
+* and logic for the game. Squares can be added to the board. Extends JFrame and
+* implements ActionListener.
 *
 * @author Gabriel Lee
 */
@@ -22,6 +23,8 @@ public class Board extends JFrame implements ActionListener {
   private boolean defaultLayout = true;
   private boolean exitExport = false;
   private int[][] layoutInput = new int[8][8];
+  private int redPieces = -1;
+  private int whitePieces = -1;
 
   public static void main(String[] args) {
     Board board = new Board(args);
@@ -171,6 +174,13 @@ public class Board extends JFrame implements ActionListener {
         playerTurn ^= 1;
       }
     } else { // second click
+      updatePiecesCount();
+      if (redPieces == 0) {
+        endWin("White");
+      }
+      if (whitePieces == 0) {
+        endWin("Red");
+      }
       moveTo = (Square) e.getSource();
       clickCount = 0;
       validFrom = false;
@@ -218,5 +228,50 @@ public class Board extends JFrame implements ActionListener {
         System.out.println("Error: Unknown or unexpected playerTurn value.");
         break;
     }
+  }
+
+  /**
+  * Updates the count number of pieces of each player.
+  */
+  private void updatePiecesCount() {
+    redPieces = 0;
+    whitePieces = 0;
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        if (squares[i][j].getPiece() == 0 || squares[i][j].getPiece() == 2) {
+          redPieces++;
+        }
+        if (squares[i][j].getPiece() == 1 || squares[i][j].getPiece() == 3) {
+          whitePieces++;
+        }
+      }
+    }
+  }
+
+  /**
+  * Displays a cool ASCII art and announces end game.
+  *
+  * @param player string of player identity
+  */
+  private void endWin(String player) {
+    System.out.println("\n\n        ,....,");
+    System.out.println("      ,::::::<");
+    System.out.println("     ,::/^\\'``.");
+    System.out.println("    ,::/, `   e`.");
+    System.out.println("   ,::; |        '.");
+    System.out.println("   ,::|  \\___,-.  c)");
+    System.out.println("   ;::|     \\   '-'");
+    System.out.println("   ;::|      \\ ");
+    System.out.println("   ;::|   _.=`\\ ");
+    System.out.println("   `;:|.=` _.=`\\ ");
+    System.out.println("     '|_.=`   __\\ ");
+    System.out.println("     `\\_..==`` /");
+    System.out.println("      .'.___.-'.");
+    System.out.println("     /          \\ ");
+    System.out.println("    ('--......--') ");
+    System.out.println("    /'--......--'\\ ");
+    System.out.println("    `''--......--''`");
+    System.out.println("Game ended: " + player + " won!\n\n");
+    System.exit(0);
   }
 }
