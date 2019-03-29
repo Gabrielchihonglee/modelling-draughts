@@ -145,42 +145,44 @@ public class Board extends JFrame implements ActionListener {
   */
   public void actionPerformed(ActionEvent e) {
     updateTitleTurn();
-    if (clickCount == 0 && ((((Square) e.getSource()).getPiece() == playerTurn) || (((Square) e.getSource()).getPiece() - 2 == playerTurn))) { // first click and matches player turn
-      moveFrom = (Square) e.getSource();
-      // goes over all squares to check if it's a valid moving target
-      for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-          if (moveFrom.canMoveTo(squares[i][j])) {
-            if (!jumpStreak) { // player shouldn't be allowed to move after jumping
+    updatePiecesCount();
+    if (redPieces == 0) {
+      endWin("White");
+    }
+    if (whitePieces == 0) {
+      endWin("Red");
+    }
+    if (clickCount == 0) { // first click and matches player turn
+      if ((((Square) e.getSource()).getPiece() == playerTurn) || (((Square) e.getSource()).getPiece() - 2 == playerTurn)) {
+        moveFrom = (Square) e.getSource();
+        // goes over all squares to check if it's a valid moving target
+        for (int i = 0; i < 8; i++) {
+          for (int j = 0; j < 8; j++) {
+            if (moveFrom.canMoveTo(squares[i][j])) {
+              if (!jumpStreak) { // player shouldn't be allowed to move after jumping
+                validFrom = true;
+                squares[i][j].highlightSelect();
+              }
+            }
+          }
+        }
+        // goes over all squares to check if it's a valid jumping target
+        for (int i = 0; i < 8; i++) {
+          for (int j = 0; j < 8; j++) {
+            if (moveFrom.canJumpTo(squares[i][j])) {
               validFrom = true;
               squares[i][j].highlightSelect();
             }
           }
         }
-      }
-      // goes over all squares to check if it's a valid jumping target
-      for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-          if (moveFrom.canJumpTo(squares[i][j])) {
-            validFrom = true;
-            squares[i][j].highlightSelect();
-          }
+        if (validFrom) {
+          clickCount = 1;
+        } else if (jumpStreak) { // not valid from (can't jump anymore) and is in jump streak
+          jumpStreak = false;
+          playerTurn ^= 1;
         }
       }
-      if (validFrom) {
-        clickCount = 1;
-      } else if (jumpStreak) { // not valid from (can't jump anymore) and is in jump streak
-        jumpStreak = false;
-        playerTurn ^= 1;
-      }
     } else { // second click
-      updatePiecesCount();
-      if (redPieces == 0) {
-        endWin("White");
-      }
-      if (whitePieces == 0) {
-        endWin("Red");
-      }
       moveTo = (Square) e.getSource();
       clickCount = 0;
       validFrom = false;
